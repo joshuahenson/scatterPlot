@@ -1,4 +1,10 @@
 // compileExpanded: $1.css
+.axis path,
+.axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
 
 .dot {
   stroke: black;

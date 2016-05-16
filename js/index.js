@@ -1,6 +1,8 @@
 /* global d3 */
 
-const margin = { top: 20, right: 10, bottom: 20, left: 10 };
+// todo fix bottom scale
+
+const margin = { top: 20, right: 20, bottom: 20, left: 30 };
 
 const width = 800 - margin.left - margin.right;
 const height = 600 - margin.top - margin.bottom;
@@ -14,12 +16,21 @@ const svg = d3.select('#root')
 
 const buildPlot = (data) => {
   const xScale = d3.time.scale()
-    .domain(d3.extent(data, d => d.DateObj)).nice()
-    .range([0, width]);
+    .domain(d3.extent(data, d => d.DateObj))
+    .range([0, width]).nice();
 
   const yScale = d3.scale.linear()
-    .domain(d3.extent(data, d => d.Place)).nice()
+    .domain([0, data.length + 1])
     .range([0, height]);
+
+  const xAxis = d3.svg.axis()
+    .scale(xScale)
+    .ticks(d3.time.seconds, 30)
+    .orient('bottom');
+
+  const yAxis = d3.svg.axis()
+    .scale(yScale)
+    .orient('left');
 
   svg.selectAll('.dot')
       .data(data)
@@ -29,6 +40,28 @@ const buildPlot = (data) => {
       .attr('cx', d => xScale(d.DateObj))
       .attr('cy', d => yScale(d.Place))
       .style('fill', d => (d.Doping ? 'red' : 'green'));
+
+  svg.append('g')
+      .attr('class', 'axis')
+      .attr('transform', `translate(0, ${height})`)
+      .call(xAxis)
+    .append('text')
+      .attr('class', 'label')
+      .attr('x', width / 2)
+      .attr('y', -6)
+      .style('text-anchor', 'center')
+      .text('Time');
+
+  svg.append('g')
+      .attr('class', 'axis')
+      .call(yAxis)
+    .append('text')
+      .attr('class', 'label')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 18)
+      .attr('x', -height / 2)
+      .style('text-anchor', 'end')
+      .text('Rank');
 };
 
 const addDateObj = (element) => {
