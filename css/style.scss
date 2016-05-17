@@ -1,4 +1,19 @@
 // compileExpanded: $1.css
+
+html {
+  background-color: lighten(#DAD8A7, 20%);
+}
+
+.container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.plot text {
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
 .axis path,
 .axis line {
   fill: none;
@@ -7,5 +22,5 @@
 }
 
 .dot {
-  stroke: black;
+  stroke: #DAD8A7;
 }
