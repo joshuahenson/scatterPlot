@@ -6,12 +6,13 @@ const tooltip = d3.select('#root').append('div')
     .attr('class', 'tooltip')
     .style('opacity', 0);
 
-const width = 800 - margin.left - margin.right;
-const height = 600 - margin.top - margin.bottom;
+const width = 600 - margin.left - margin.right;
+const height = 400 - margin.top - margin.bottom;
 
-d3.select('h1')
-  .classed('loading', false)
-  .html('Doping in Professional Bicycle Racing');
+const legendKey = [
+  { class: 'dot doping', alleged: 'Riders with doping allegations' },
+  { class: 'dot not-doping', alleged: 'Riders without doping allegations' }
+];
 
 const svg = d3.select('#root')
   .append('svg')
@@ -33,7 +34,7 @@ const buildPlot = (data) => {
     .attr('class', 'plot-title')
     .attr('x', width / 2)
     .attr('y', -margin.top / 2)
-    .text("35 Fastest times up Alpe d'Huez");
+    .text('35 Fastest times up Alpe d\'Huez');
 
   const xScale = d3.scale.linear()
     .domain(d3.extent(data, (d) => d.Seconds)).nice()
@@ -54,27 +55,32 @@ const buildPlot = (data) => {
     .orient('left')
     .ticks(4);
 
-  svg.selectAll('.dot')
+  svg.selectAll('.circle')
       .data(data)
     .enter().append('circle')
-      .attr('class', 'dot')
-      .attr('r', 5)
-      .attr('cx', d => xScale(d.Seconds))
-      .attr('cy', d => yScale(d.Place))
-      .style('fill', d => (d.Doping ? '#FF3D7F' : '#3FB8AF'))
-    .on('mouseover', d => {
-      tooltip.transition()
-        .duration(500)
-        .style('opacity', 1);
-      tooltip.html(formatTooltip(d))
-        .style('left', `${d3.event.pageX + 20}px`)
-        .style('top', `${d3.event.pageY - 30}px`);
-    })
-  .on('mouseout', () => {
-    tooltip.transition()
-      .duration(250)
-      .style('opacity', 0);
-  });
+      .style('fill', '#DAD8A7')
+      .attr('r', 4)
+      .attr('cx', 5)
+      .attr('cy', 0)
+      .on('mouseover', d => {
+        tooltip.transition()
+          .duration(250)
+          .style('opacity', 1);
+        tooltip.html(formatTooltip(d))
+          .style('left', `${d3.event.pageX + 20}px`)
+          .style('top', `${d3.event.pageY - 30}px`);
+      })
+      .on('mouseout', () => {
+        tooltip.transition()
+          .duration(250)
+          .style('opacity', 0);
+      })
+      .transition()
+        .duration(2000)
+        .delay(500)
+        .style('fill', d => (d.Doping ? '#FF3D7F' : '#3FB8AF'))
+        .attr('cx', d => xScale(d.Seconds))
+        .attr('cy', d => yScale(d.Place));
 
   svg.append('g')
       .attr('class', 'axis')
@@ -95,14 +101,44 @@ const buildPlot = (data) => {
       .attr('y', 15)
       .attr('x', -height / 2)
       .text('Rank');
+
+  const legend = svg.selectAll('.legend')
+    .data(legendKey)
+    .enter().append('g')
+      .attr('class', 'legend')
+      .attr('transform', (d, i) => `translate(0, ${i * 20})`);
+
+  legend.append('rect')
+    .attr('x', margin.left)
+    .attr('y', height - 80)
+    .attr('width', 14)
+    .attr('height', 14)
+    .attr('class', d => d.class)
+    .style('opacity', 0)
+    .transition()
+      .duration(500)
+      .delay(2000)
+      .style('opacity', 1);
+
+  legend.append('text')
+    .attr('x', margin.left + 16)
+    .attr('y', height - 80)
+    .attr('dy', '14px')
+    .style('text-anchor', 'start')
+    .text(d => d.alleged)
+    .style('opacity', 0)
+    .transition()
+      .duration(500)
+      .delay(2000)
+      .style('opacity', 1);
 };
 
 // use remote file on codepen
 // d3.json('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/cyclist-data.json', (error, data) => {
 d3.json('../temp/cyclist-data.json', (error, data) => {
-  if (error) {
-    console.log(error);
-  }
+  // if (error) {
+  //   console.log(error);
+  // }
   // console.log(data);
   buildPlot(data);
 });
