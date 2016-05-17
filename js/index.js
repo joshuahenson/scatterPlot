@@ -1,9 +1,13 @@
 /* global d3 */
 
-const margin = { top: 20, right: 20, bottom: 20, left: 30 };
+const margin = { top: 30, right: 20, bottom: 20, left: 30 };
 
 const width = 800 - margin.left - margin.right;
 const height = 600 - margin.top - margin.bottom;
+
+d3.select('h1')
+  .classed('loading', false)
+  .html('Doping in Professional Bicycle Racing');
 
 const svg = d3.select('#root')
   .append('svg')
@@ -18,6 +22,12 @@ const convertTime = (d) => formatTime(new Date(0, 0, 0, 0, 0, d));
 
 // Primary function to build scatterplot
 const buildPlot = (data) => {
+  svg.append('text')
+    .attr('class', 'plot-title')
+    .attr('x', width / 2)
+    .attr('y', -margin.top / 2)
+    .text("35 Fastest times up Alpe d'Huez");
+
   const xScale = d3.scale.linear()
     .domain(d3.extent(data, (d) => d.Seconds)).nice()
     .range([0, width]).nice();
@@ -54,7 +64,6 @@ const buildPlot = (data) => {
       .attr('class', 'label')
       .attr('x', width / 2)
       .attr('y', -6)
-      .style('text-anchor', 'middle')
       .text('(Min:Sec)');
 
   svg.append('g')
@@ -65,7 +74,6 @@ const buildPlot = (data) => {
       .attr('transform', 'rotate(-90)')
       .attr('y', 15)
       .attr('x', -height / 2)
-      .style('text-anchor', 'middle')
       .text('Rank');
 };
 
