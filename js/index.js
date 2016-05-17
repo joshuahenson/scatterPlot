@@ -2,6 +2,10 @@
 
 const margin = { top: 30, right: 20, bottom: 20, left: 30 };
 
+const tooltip = d3.select('#root').append('div')
+    .attr('class', 'tooltip')
+    .style('opacity', 0);
+
 const width = 800 - margin.left - margin.right;
 const height = 600 - margin.top - margin.bottom;
 
@@ -19,6 +23,9 @@ const svg = d3.select('#root')
 
 const formatTime = d3.time.format('%M:%S');
 const convertTime = (d) => formatTime(new Date(0, 0, 0, 0, 0, d));
+
+const formatTooltip = (d) => `${d.Name}: ${d.Nationality}<br/>Rank: ${d.Place}<br/>
+  Time: ${d.Time} in ${d.Year}<br/>${d.Doping ? `<br/>${d.Doping}` : ''}`;
 
 // Primary function to build scatterplot
 const buildPlot = (data) => {
@@ -54,7 +61,20 @@ const buildPlot = (data) => {
       .attr('r', 5)
       .attr('cx', d => xScale(d.Seconds))
       .attr('cy', d => yScale(d.Place))
-      .style('fill', d => (d.Doping ? '#FF3D7F' : '#3FB8AF'));
+      .style('fill', d => (d.Doping ? '#FF3D7F' : '#3FB8AF'))
+    .on('mouseover', d => {
+      tooltip.transition()
+        .duration(500)
+        .style('opacity', 1);
+      tooltip.html(formatTooltip(d))
+        .style('left', `${d3.event.pageX + 20}px`)
+        .style('top', `${d3.event.pageY - 30}px`);
+    })
+  .on('mouseout', () => {
+    tooltip.transition()
+      .duration(250)
+      .style('opacity', 0);
+  });
 
   svg.append('g')
       .attr('class', 'axis')
